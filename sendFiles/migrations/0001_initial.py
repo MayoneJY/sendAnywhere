@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('file', models.FileField(upload_to='files/%Y/%m/%d/')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('file_password', models.CharField(max_length=100)),
+                ('file_token', models.CharField(max_length=100)),
             ],
         ),
     ]

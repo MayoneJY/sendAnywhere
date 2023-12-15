@@ -68,7 +68,7 @@
                 {% csrf_token %}
                 <!-- 숨겨진 파일 입력 필드 -->
                 <input type="file" id="fileInput" name="file" style="display: none;" onchange="form.submit()" />
-                <input type="text" id="file_password" value="test" name="file_password" style="display: none;" />
+                <input type="text" id="file_token" value="test" name="file_token" style="display: none;" />
                 <!-- 사용자에게 보이는 버튼 -->
                 <input type="button" id="btnSend" value="+" onclick="clickSend();" />
             </form>            

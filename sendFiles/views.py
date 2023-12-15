@@ -12,9 +12,9 @@ def index(request):
     if request.method == 'POST':
         form = FileForm(request.POST, request.FILES)
         if 'inputReceive' in request.POST:
-            # file_password와 일치하는 파일이 있으면 다운로드
-            file_password = request.POST['inputReceive']
-            file = File.objects.filter(file_password=file_password)
+            # file_token와 일치하는 파일이 있으면 다운로드
+            file_token = request.POST['inputReceive']
+            file = File.objects.filter(file_token=file_token)
             if file.exists():
                 file = file.first()
                 decrypted_data = decrypt_file(file.file.read())
@@ -38,13 +38,13 @@ def index(request):
 
             
             # 랜덤 문자 6자리 생성
-            file_password = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+            file_token = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
             # 비밀번호 중복 확인
-            while File.objects.filter(file_password=file_password).exists():
-                file_password = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
-            file_instance.file_password = file_password
+            while File.objects.filter(file_token=file_token).exists():
+                file_token = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+            file_instance.file_token = file_token
             file_instance.save()
-            return render(request, 'sendFiles/success.html',{'file_password': file_password})
+            return render(request, 'sendFiles/success.html',{'file_token': file_token})
         else:
             return HttpResponse('Invalid Form')
     else:
