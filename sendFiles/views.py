@@ -17,16 +17,15 @@ def index(request):
             reload_check = False
             if passwordCheck != file_user_password:
                 reload_check = True
-                
-            # 비밀번호가 입력되지 않았으면 다시 로드
-            if file_user_password == '':
-                return render(request, 'sendFiles/success.html',{'file_token': file_token, 'reload_check': reload_check})
             
             # file_token과 일치하는 데이터가 있으면 비밀번호 저장
             file = File.objects.filter(file_token=file_token)
             if file.exists():
                 file = file.first()
-                file.file_user_password = generate_sha256_hash(file_user_password)
+                if(file_user_password == ''):
+                    file.file_user_password = None
+                else:
+                    file.file_user_password = generate_sha256_hash(file_user_password)
                 file.save()
                 
             return render(request, 'sendFiles/success.html',{'file_token': file_token, 'file_user_password': file_user_password, 'reload_check': reload_check})
@@ -56,7 +55,7 @@ def index(request):
                 
                 if file.exists():
                     file = file.first()
-                    if(file.file_user_password != "" or file.file_user_password != None):
+                    if(file.file_user_password != None):
                         return render(request, 'sendFiles/password_check.html', {'file_token': file_token})
                     decrypted_data = decrypt_file(file.file.read())
                     response = HttpResponse(decrypted_data, content_type='application/force-download')
