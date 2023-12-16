@@ -30,6 +30,22 @@ def index(request):
                 file.save()
                 
             return render(request, 'sendFiles/success.html',{'file_token': file_token, 'file_user_password': file_user_password, 'reload_check': reload_check})
+        elif 'file_check_password' in request.POST:
+            file_token = request.POST['file_token']
+            file_check_password = request.POST['file_check_password']
+            file = File.objects.filter(file_token=file_token)
+            
+            if file.exists():
+                file = file.first()
+                if file.file_user_password == file_check_password:
+                    decrypted_data = decrypt_file(file.file.read())
+                    response = HttpResponse(decrypted_data, content_type='application/force-download')
+                    response['Content-Disposition'] = 'attachment; filename=%s' % file.file.name
+                    return response
+                else:
+                    return render(request, 'sendFiles/password_check.html', {'file_token': file_token, 'error_message': '비밀번호가 일치하지 않습니다.'})
+            else:
+                return render(request, 'sendFiles/index.html', {'file_token': file_token, 'error_message': '파일이 존재하지 않습니다.'})
         else:
             form = FileForm(request.POST, request.FILES)
             
@@ -40,6 +56,8 @@ def index(request):
                 
                 if file.exists():
                     file = file.first()
+                    if(file.file_user_password != "" or file.file_user_password != None):
+                        return render(request, 'sendFiles/password_check.html', {'file_token': file_token})
                     decrypted_data = decrypt_file(file.file.read())
                     response = HttpResponse(decrypted_data, content_type='application/force-download')
                     response['Content-Disposition'] = 'attachment; filename=%s' % file.file.name
