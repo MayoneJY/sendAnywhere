@@ -111,7 +111,20 @@
             <div id="title">
                 암호
             </div>
-            <input type="text" id="inputPassword" name="file_user_password" value="" placeholder="원하는 암호 입력(최대 10자리)"/>
+            <form method="POST" action="{% url 'index' %}">
+                {% csrf_token %}
+                <!-- 숨겨진 파일 입력 필드 -->
+                <input type="text" id="file_token" value="{{file_token}}" name="file_token" style="display: none;" />
+                <!-- 사용자에게 보이는 필드 -->
+                <input 
+                    type="text" 
+                    id="inputPassword" 
+                    name="file_user_password" 
+                    value="{{file_user_password}}" 
+                    placeholder="원하는 암호 입력(최대 10자리)"
+                    maxlength="10"
+                    />
+            </form>
             <div id="textDesc">
                 * 입력하지 않을 시 암호가 설정되지 않습니다
             </div>
