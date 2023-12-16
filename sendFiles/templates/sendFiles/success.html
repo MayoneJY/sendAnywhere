@@ -47,7 +47,7 @@
             color: rgba(255,0,0,0.5);
             cursor: pointer;
         }
-        #textDesc {
+        .textDesc {
             position: absolute;
             width: 200px;
             top: 80%;
@@ -58,10 +58,13 @@
         .inline-block {
             display: inline-block;
         }
-        #iconBack{
+        .iconBack{
             position: absolute;
             right: 10px;
             top: 10px;
+            cursor: default;
+        }
+        #iconBack{
             cursor: pointer;
         }
         #title{
@@ -97,7 +100,7 @@
             <div id="title">
                 성공!
             </div>
-            <span class="material-symbols-outlined" id="iconBack">
+            <span class="material-symbols-outlined iconBack" id="iconBack">
                 close
             </span>
             <div id="textCode">
@@ -108,18 +111,23 @@
                     content_paste
                 </span>
             </div>
-            <div id="textDesc">
+            <div class="textDesc" id="textDesc">
                 코드를 기억하세요.
             </div>
         </div>
         <div id="passwordBox">
             <div id="title">
-                암호 <span id="optional">[옵션]</span>
+                암호
+                <span id="optional">[옵션]</span>
             </div>
+            <span class="material-symbols-outlined iconBack" id="iconLock">
+                lock_open
+            </span>
             <form method="POST" action="{% url 'index' %}">
                 {% csrf_token %}
                 <!-- 숨겨진 파일 입력 필드 -->
                 <input type="text" id="file_token" value="{{file_token}}" name="file_token" style="display: none;" />
+                <input type="text" id="passwordCheck" value="{{file_user_password}}" name="passwordCheck" style="display: none;" />
                 <input type="submit" value="확인" style="display: none;" />
                 <!-- 사용자에게 보이는 필드 -->
                 <input 
@@ -131,7 +139,7 @@
                     maxlength="10"
                     />
             </form>
-            <div id="textDesc">
+            <div class="textDesc" id="textPasswordDesc">
                 * 0~10자리의 암호를 입력하세요.
             </div>
         </div>
@@ -158,5 +166,21 @@
         // 새로고침
         window.location.href = "{% url 'index' %}";
     });
+
+    // 브라우저 로드 시
+    window.onload = function(){
+        const reload_check = '{{reload_check}}';
+        const file_user_password = '{{file_user_password}}';
+        if(file_user_password !== ''){
+            document.querySelector("#iconLock").innerHTML = "lock";
+        }
+        
+        if(reload_check == 'True'){
+            document.querySelector("#textPasswordDesc").innerHTML = "암호가 수정되었습니다.";
+            setTimeout(function(){
+                document.querySelector("#textPasswordDesc").innerHTML = "* 0~10자리의 암호를 입력하세요.";
+            }, 2000);
+        }
+    }
 </script>
 </html>

@@ -13,10 +13,14 @@ def index(request):
         if 'file_user_password' in request.POST:
             file_token = request.POST['file_token']
             file_user_password = request.POST['file_user_password']
-            
+            passwordCheck = request.POST['passwordCheck']
+            reload_check = False
+            if passwordCheck != file_user_password:
+                reload_check = True
+                
             # 비밀번호가 입력되지 않았으면 다시 로드
             if file_user_password == '':
-                return render(request, 'sendFiles/success.html',{'file_token': file_token})
+                return render(request, 'sendFiles/success.html',{'file_token': file_token, 'reload_check': reload_check})
             
             # file_token과 일치하는 데이터가 있으면 비밀번호 저장
             file = File.objects.filter(file_token=file_token)
@@ -25,7 +29,7 @@ def index(request):
                 file.file_user_password = file_user_password
                 file.save()
                 
-            return render(request, 'sendFiles/success.html',{'file_token': file_token, 'file_user_password': file_user_password})
+            return render(request, 'sendFiles/success.html',{'file_token': file_token, 'file_user_password': file_user_password, 'reload_check': reload_check})
         else:
             form = FileForm(request.POST, request.FILES)
             
