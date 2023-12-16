@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.template import loader
 from .models import File
 from .forms import FileForm
-from .security import encrypt_file, decrypt_file
+from .security import encrypt_file, decrypt_file, generate_sha256_hash
 from .memory_file import create_in_memory_file
 import random
 import string
@@ -26,7 +26,7 @@ def index(request):
             file = File.objects.filter(file_token=file_token)
             if file.exists():
                 file = file.first()
-                file.file_user_password = file_user_password
+                file.file_user_password = generate_sha256_hash(file_user_password)
                 file.save()
                 
             return render(request, 'sendFiles/success.html',{'file_token': file_token, 'file_user_password': file_user_password, 'reload_check': reload_check})
@@ -37,7 +37,7 @@ def index(request):
             
             if file.exists():
                 file = file.first()
-                if file.file_user_password == file_check_password:
+                if file.file_user_password == generate_sha256_hash(file_check_password):
                     decrypted_data = decrypt_file(file.file.read())
                     response = HttpResponse(decrypted_data, content_type='application/force-download')
                     response['Content-Disposition'] = 'attachment; filename=%s' % file.file.name
