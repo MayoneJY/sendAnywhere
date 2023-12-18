@@ -7,6 +7,11 @@ from .security import encrypt_file, decrypt_file, generate_sha256_hash
 from .memory_file import create_in_memory_file
 import random
 import string
+import urllib
+
+def safe_file_name(file_name):
+    # URL 인코딩을 사용하여 비-ASCII 문자를 처리
+    return urllib.parse.quote(file_name)
 
 def index(request):
     if request.method == 'POST':
@@ -39,7 +44,7 @@ def index(request):
                 if file.file_user_password == generate_sha256_hash(file_check_password):
                     decrypted_data = decrypt_file(file.file.read())
                     response = HttpResponse(decrypted_data, content_type='application/force-download')
-                    response['Content-Disposition'] = 'attachment; filename=%s' % file.file.name
+                    response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'{}'.format(safe_file_name(file.file.name.split('/')[-1]))
                     return response
                 else:
                     return render(request, 'sendFiles/password_check.html', {'file_token': file_token, 'error_message': '비밀번호가 일치하지 않습니다.'})
@@ -59,7 +64,8 @@ def index(request):
                         return render(request, 'sendFiles/password_check.html', {'file_token': file_token})
                     decrypted_data = decrypt_file(file.file.read())
                     response = HttpResponse(decrypted_data, content_type='application/force-download')
-                    response['Content-Disposition'] = 'attachment; filename=%s' % file.file.name
+                    response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'{}'.format(safe_file_name(file.file.name.split('/')[-1]))
+                    print(file.file.name.split('/')[-1])
                     
                     return response
                 else:
